@@ -1,9 +1,11 @@
 import { Feature } from "@/components/pages/home/feature";
+import { Header } from "@/components/ui/header";
 import Image from "next/image";
 
 export default function Home() {
   return (
     <div className="relative flex flex-col min-h-screen items-center bg-zinc-50 font-sans dark:bg-black">
+      <Header />
       <div className="relative top-0 left-0 w-full h-screen overflow-hidden">
         <Image
           src="/hero.svg"
@@ -24,8 +26,7 @@ export default function Home() {
         <h1 className="relative top-45 lg:w-1/2 w-full text-7xl font-bold text-white">PROTECT OUR EARTH TOGETHER</h1>
         <h1 className="relative top-50 lg:w-1/2 w-full text-7xl font-bold text-white text-right">CLEAN AIR, CLEAN FUTURE</h1>
       </div>
-      
-      
+    
       <Feature />
     </div>
   );
