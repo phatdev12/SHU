@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Schibsted_Grotesk } from "next/font/google";
+import { QueryProvider } from "@/providers/query";
 import "./globals.css";
 
 const schibsted_Grotesk = Schibsted_Grotesk({
@@ -19,10 +20,10 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body
-        className={`${schibsted_Grotesk.variable} antialiased`}
-      >
-        {children}
+      <body className={`${schibsted_Grotesk.variable} antialiased`}>
+        <QueryProvider>
+          {children}
+        </QueryProvider>
       </body>
     </html>
   );

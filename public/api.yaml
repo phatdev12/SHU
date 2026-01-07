@@ -1,0 +1,3613 @@
+openapi: 3.0.3
+info:
+  title: SHU API
+  description: SHU API Documentation
+  version: 1.0.0
+  contact:
+    name: SHU Foundation
+servers:
+  - url: http://localhost:2354
+    description: Development Server
+paths:
+  /:
+    get:
+      tags:
+        - Health
+      summary: Health Check
+      description: Kiểm tra xem server có đang chạy không
+      operationId: getIndex
+  /api/ws/device/{deviceId}:
+    ws:
+      parameters:
+        - name: deviceId
+          in: path
+          required: true
+          schema:
+            type: string
+      operationId: wsApiWsDeviceByDeviceId
+  /api/ws/client:
+    ws:
+      parameters:
+        - name: token
+          in: query
+          required: true
+          schema:
+            description: User JWT token
+            type: string
+        - name: deviceId
+          in: query
+          required: false
+          schema:
+            description: Specific device to watch
+            type: string
+      operationId: wsApiWsClient
+  /api/auth/register:
+    post:
+      tags:
+        - Authentication
+      summary: Đăng ký tài khoản mới
+      description: Tạo tài khoản người dùng mới với email, tên người dùng và mật khẩu.
+        Một email xác minh sẽ được gửi.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - username
+                - email
+                - password
+                - confirmPassword
+              properties:
+                username:
+                  description: Tên người dùng
+                  type: string
+                email:
+                  format: email
+                  description: Địa chỉ email
+                  type: string
+                password:
+                  description: Mật khẩu (tối thiểu 6 ký tự)
+                  type: string
+                confirmPassword:
+                  description: Xác nhận mật khẩu
+                  type: string
+                deviceId:
+                  description: ID thiết bị IoT (nếu có)
+                  type: string
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              required:
+                - username
+                - email
+                - password
+                - confirmPassword
+              properties:
+                username:
+                  description: Tên người dùng
+                  type: string
+                email:
+                  format: email
+                  description: Địa chỉ email
+                  type: string
+                password:
+                  description: Mật khẩu (tối thiểu 6 ký tự)
+                  type: string
+                confirmPassword:
+                  description: Xác nhận mật khẩu
+                  type: string
+                deviceId:
+                  description: ID thiết bị IoT (nếu có)
+                  type: string
+          multipart/form-data:
+            schema:
+              type: object
+              required:
+                - username
+                - email
+                - password
+                - confirmPassword
+              properties:
+                username:
+                  description: Tên người dùng
+                  type: string
+                email:
+                  format: email
+                  description: Địa chỉ email
+                  type: string
+                password:
+                  description: Mật khẩu (tối thiểu 6 ký tự)
+                  type: string
+                confirmPassword:
+                  description: Xác nhận mật khẩu
+                  type: string
+                deviceId:
+                  description: ID thiết bị IoT (nếu có)
+                  type: string
+      responses:
+        "200":
+          description: Response for status 200
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - success
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+                  token:
+                    type: string
+        "400":
+          description: Response for status 400
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - error
+                properties:
+                  error:
+                    type: string
+      operationId: postApiAuthRegister
+  /api/auth/verify-email:
+    get:
+      tags:
+        - Authentication
+      summary: Xác minh email
+      description: Xác minh địa chỉ email người dùng bằng token được gửi trong email.
+        Trả về JWT token khi thành công.
+      parameters:
+        - name: token
+          in: query
+          required: true
+          schema:
+            description: Email verification token
+            type: string
+      responses:
+        "200":
+          description: Response for status 200
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - success
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+                  token:
+                    type: string
+        "400":
+          description: Response for status 400
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - error
+                properties:
+                  error:
+                    type: string
+      operationId: getApiAuthVerify-email
+  /api/auth/login:
+    post:
+      tags:
+        - Authentication
+      summary: Đăng nhập
+      description: Đăng nhập bằng email và mật khẩu. Trả về JWT token nếu thành công.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - email
+                - password
+              properties:
+                email:
+                  format: email
+                  description: Địa chỉ email
+                  type: string
+                password:
+                  description: Mật khẩu
+                  type: string
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              required:
+                - email
+                - password
+              properties:
+                email:
+                  format: email
+                  description: Địa chỉ email
+                  type: string
+                password:
+                  description: Mật khẩu
+                  type: string
+          multipart/form-data:
+            schema:
+              type: object
+              required:
+                - email
+                - password
+              properties:
+                email:
+                  format: email
+                  description: Địa chỉ email
+                  type: string
+                password:
+                  description: Mật khẩu
+                  type: string
+      responses:
+        "200":
+          description: Response for status 200
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - success
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+                  token:
+                    type: string
+        "400":
+          description: Response for status 400
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - error
+                properties:
+                  error:
+                    type: string
+      operationId: postApiAuthLogin
+  /api/auth/logout:
+    post:
+      operationId: postApiAuthLogout
+  /api/posts/upload-url:
+    post:
+      tags:
+        - Posts
+      summary: Tạo URL upload MinIO
+      description: Trả về presigned URL để upload ảnh lên MinIO/S3
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - contentType
+              properties:
+                contentType:
+                  description: "MIME type, vd: image/png"
+                  type: string
+                extension:
+                  description: "Phần mở rộng file, vd: png"
+                  type: string
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              required:
+                - contentType
+              properties:
+                contentType:
+                  description: "MIME type, vd: image/png"
+                  type: string
+                extension:
+                  description: "Phần mở rộng file, vd: png"
+                  type: string
+          multipart/form-data:
+            schema:
+              type: object
+              required:
+                - contentType
+              properties:
+                contentType:
+                  description: "MIME type, vd: image/png"
+                  type: string
+                extension:
+                  description: "Phần mở rộng file, vd: png"
+                  type: string
+      responses:
+        "200":
+          description: Response for status 200
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - uploadUrl
+                  - key
+                  - url
+                properties:
+                  uploadUrl:
+                    type: string
+                  key:
+                    type: string
+                  url:
+                    type: string
+      operationId: postApiPostsUpload-url
+  /api/posts/:
+    post:
+      tags:
+        - Posts
+      summary: Tạo bài viết với AQI từ userInfo
+      description: Tạo bài viết mới, AQI sẽ được lấy tự động từ dữ liệu mới nhất của
+        device (userInfo). Nếu có aqiIndex trong body sẽ dùng giá trị đó.
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - title
+                - content
+                - location
+              properties:
+                title:
+                  minLength: 1
+                  maxLength: 255
+                  type: string
+                content:
+                  minLength: 1
+                  maxLength: 5000
+                  type: string
+                aqiIndex:
+                  minimum: 0
+                  maximum: 500
+                  type: number
+                location:
+                  type: object
+                  required:
+                    - lat
+                    - lng
+                  properties:
+                    lat:
+                      description: Vĩ độ
+                      type: number
+                    lng:
+                      description: Kinh độ
+                      type: number
+                    name:
+                      description: Tên địa điểm
+                      type: string
+                media:
+                  type: array
+                  items:
+                    type: object
+                    required:
+                      - key
+                      - url
+                    properties:
+                      key:
+                        description: Object key trên S3/MinIO
+                        type: string
+                      url:
+                        description: Public URL của file
+                        type: string
+                      contentType:
+                        type: string
+                      size:
+                        type: number
+                      width:
+                        type: number
+                      height:
+                        type: number
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              required:
+                - title
+                - content
+                - location
+              properties:
+                title:
+                  minLength: 1
+                  maxLength: 255
+                  type: string
+                content:
+                  minLength: 1
+                  maxLength: 5000
+                  type: string
+                aqiIndex:
+                  minimum: 0
+                  maximum: 500
+                  type: number
+                location:
+                  type: object
+                  required:
+                    - lat
+                    - lng
+                  properties:
+                    lat:
+                      description: Vĩ độ
+                      type: number
+                    lng:
+                      description: Kinh độ
+                      type: number
+                    name:
+                      description: Tên địa điểm
+                      type: string
+                media:
+                  type: array
+                  items:
+                    type: object
+                    required:
+                      - key
+                      - url
+                    properties:
+                      key:
+                        description: Object key trên S3/MinIO
+                        type: string
+                      url:
+                        description: Public URL của file
+                        type: string
+                      contentType:
+                        type: string
+                      size:
+                        type: number
+                      width:
+                        type: number
+                      height:
+                        type: number
+          multipart/form-data:
+            schema:
+              type: object
+              required:
+                - title
+                - content
+                - location
+              properties:
+                title:
+                  minLength: 1
+                  maxLength: 255
+                  type: string
+                content:
+                  minLength: 1
+                  maxLength: 5000
+                  type: string
+                aqiIndex:
+                  minimum: 0
+                  maximum: 500
+                  type: number
+                location:
+                  type: object
+                  required:
+                    - lat
+                    - lng
+                  properties:
+                    lat:
+                      description: Vĩ độ
+                      type: number
+                    lng:
+                      description: Kinh độ
+                      type: number
+                    name:
+                      description: Tên địa điểm
+                      type: string
+                media:
+                  type: array
+                  items:
+                    type: object
+                    required:
+                      - key
+                      - url
+                    properties:
+                      key:
+                        description: Object key trên S3/MinIO
+                        type: string
+                      url:
+                        description: Public URL của file
+                        type: string
+                      contentType:
+                        type: string
+                      size:
+                        type: number
+                      width:
+                        type: number
+                      height:
+                        type: number
+      responses:
+        "200":
+          description: Response for status 200
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - id
+                  - userId
+                  - author
+                  - title
+                  - content
+                  - aqiIndex
+                  - location
+                  - upVotes
+                  - downVotes
+                  - createdAt
+                  - updatedAt
+                  - media
+                properties:
+                  id:
+                    type: string
+                  userId:
+                    type: string
+                  author:
+                    type: object
+                    required:
+                      - id
+                      - username
+                    properties:
+                      id:
+                        type: string
+                      username:
+                        type: string
+                      avatarUrl:
+                        type: string
+                  title:
+                    type: string
+                  content:
+                    type: string
+                  aqiIndex:
+                    type: number
+                  location:
+                    type: object
+                    required:
+                      - lat
+                      - lng
+                    properties:
+                      lat:
+                        description: Vĩ độ
+                        type: number
+                      lng:
+                        description: Kinh độ
+                        type: number
+                      name:
+                        description: Tên địa điểm
+                        type: string
+                  upVotes:
+                    type: number
+                  downVotes:
+                    type: number
+                  createdAt:
+                    type: string
+                  updatedAt:
+                    type: string
+                  media:
+                    type: array
+                    items:
+                      type: object
+                      required:
+                        - key
+                        - url
+                      properties:
+                        key:
+                          description: Object key trên S3/MinIO
+                          type: string
+                        url:
+                          description: Public URL của file
+                          type: string
+                        contentType:
+                          type: string
+                        size:
+                          type: number
+                        width:
+                          type: number
+                        height:
+                          type: number
+      operationId: postApiPosts
+    get:
+      tags:
+        - Posts
+      summary: Danh sách bài viết
+      description: Liệt kê các bài viết mới nhất kèm media và chỉ số AQI.
+      parameters:
+        - name: limit
+          in: query
+          required: false
+          schema:
+            minimum: 1
+            maximum: 100
+            default: 10
+            type: number
+        - name: offset
+          in: query
+          required: false
+          schema:
+            minimum: 0
+            default: 0
+            type: number
+      responses:
+        "200":
+          description: Response for status 200
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - items
+                  - total
+                properties:
+                  items:
+                    type: array
+                    items:
+                      type: object
+                      required:
+                        - id
+                        - userId
+                        - author
+                        - title
+                        - content
+                        - aqiIndex
+                        - location
+                        - upVotes
+                        - downVotes
+                        - createdAt
+                        - updatedAt
+                        - media
+                      properties:
+                        id:
+                          type: string
+                        userId:
+                          type: string
+                        author:
+                          type: object
+                          required:
+                            - id
+                            - username
+                          properties:
+                            id:
+                              type: string
+                            username:
+                              type: string
+                            avatarUrl:
+                              type: string
+                        title:
+                          type: string
+                        content:
+                          type: string
+                        aqiIndex:
+                          type: number
+                        location:
+                          type: object
+                          required:
+                            - lat
+                            - lng
+                          properties:
+                            lat:
+                              description: Vĩ độ
+                              type: number
+                            lng:
+                              description: Kinh độ
+                              type: number
+                            name:
+                              description: Tên địa điểm
+                              type: string
+                        upVotes:
+                          type: number
+                        downVotes:
+                          type: number
+                        createdAt:
+                          type: string
+                        updatedAt:
+                          type: string
+                        media:
+                          type: array
+                          items:
+                            type: object
+                            required:
+                              - key
+                              - url
+                            properties:
+                              key:
+                                description: Object key trên S3/MinIO
+                                type: string
+                              url:
+                                description: Public URL của file
+                                type: string
+                              contentType:
+                                type: string
+                              size:
+                                type: number
+                              width:
+                                type: number
+                              height:
+                                type: number
+                  total:
+                    type: number
+      operationId: getApiPosts
+  /api/posts/trending:
+    get:
+      tags:
+        - Posts
+      summary: Danh sách bài viết nổi bật
+      description: Liệt kê các bài viết nổi bật dựa trên số phiếu upvote và downvote,
+        kèm media và chỉ số AQI.
+      parameters:
+        - name: limit
+          in: query
+          required: false
+          schema:
+            minimum: 1
+            maximum: 100
+            default: 10
+            type: number
+        - name: offset
+          in: query
+          required: false
+          schema:
+            minimum: 0
+            default: 0
+            type: number
+      responses:
+        "200":
+          description: Response for status 200
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - items
+                  - total
+                properties:
+                  items:
+                    type: array
+                    items:
+                      type: object
+                      required:
+                        - id
+                        - userId
+                        - author
+                        - title
+                        - content
+                        - aqiIndex
+                        - location
+                        - upVotes
+                        - downVotes
+                        - createdAt
+                        - updatedAt
+                        - media
+                      properties:
+                        id:
+                          type: string
+                        userId:
+                          type: string
+                        author:
+                          type: object
+                          required:
+                            - id
+                            - username
+                          properties:
+                            id:
+                              type: string
+                            username:
+                              type: string
+                            avatarUrl:
+                              type: string
+                        title:
+                          type: string
+                        content:
+                          type: string
+                        aqiIndex:
+                          type: number
+                        location:
+                          type: object
+                          required:
+                            - lat
+                            - lng
+                          properties:
+                            lat:
+                              description: Vĩ độ
+                              type: number
+                            lng:
+                              description: Kinh độ
+                              type: number
+                            name:
+                              description: Tên địa điểm
+                              type: string
+                        upVotes:
+                          type: number
+                        downVotes:
+                          type: number
+                        createdAt:
+                          type: string
+                        updatedAt:
+                          type: string
+                        media:
+                          type: array
+                          items:
+                            type: object
+                            required:
+                              - key
+                              - url
+                            properties:
+                              key:
+                                description: Object key trên S3/MinIO
+                                type: string
+                              url:
+                                description: Public URL của file
+                                type: string
+                              contentType:
+                                type: string
+                              size:
+                                type: number
+                              width:
+                                type: number
+                              height:
+                                type: number
+                  total:
+                    type: number
+      operationId: getApiPostsTrending
+  /api/posts/{id}:
+    get:
+      tags:
+        - Posts
+      summary: Chi tiết bài viết
+      description: Trả về thông tin bài viết kèm media và chỉ số AQI.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Response for status 200
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - id
+                  - userId
+                  - author
+                  - title
+                  - content
+                  - aqiIndex
+                  - location
+                  - upVotes
+                  - downVotes
+                  - createdAt
+                  - updatedAt
+                  - media
+                properties:
+                  id:
+                    type: string
+                  userId:
+                    type: string
+                  author:
+                    type: object
+                    required:
+                      - id
+                      - username
+                    properties:
+                      id:
+                        type: string
+                      username:
+                        type: string
+                      avatarUrl:
+                        type: string
+                  title:
+                    type: string
+                  content:
+                    type: string
+                  aqiIndex:
+                    type: number
+                  location:
+                    type: object
+                    required:
+                      - lat
+                      - lng
+                    properties:
+                      lat:
+                        description: Vĩ độ
+                        type: number
+                      lng:
+                        description: Kinh độ
+                        type: number
+                      name:
+                        description: Tên địa điểm
+                        type: string
+                  upVotes:
+                    type: number
+                  downVotes:
+                    type: number
+                  createdAt:
+                    type: string
+                  updatedAt:
+                    type: string
+                  media:
+                    type: array
+                    items:
+                      type: object
+                      required:
+                        - key
+                        - url
+                      properties:
+                        key:
+                          description: Object key trên S3/MinIO
+                          type: string
+                        url:
+                          description: Public URL của file
+                          type: string
+                        contentType:
+                          type: string
+                        size:
+                          type: number
+                        width:
+                          type: number
+                        height:
+                          type: number
+      operationId: getApiPostsById
+  /api/posts/{id}/vote:
+    post:
+      tags:
+        - Posts
+      summary: Upvote/Downvote bài viết
+      description: Tạo hoặc cập nhật phiếu bầu (up/down) cho bài viết.
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - value
+              properties:
+                value:
+                  type: string
+                  enum:
+                    - 1
+                    - -1
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              required:
+                - value
+              properties:
+                value:
+                  type: string
+                  enum:
+                    - 1
+                    - -1
+          multipart/form-data:
+            schema:
+              type: object
+              required:
+                - value
+              properties:
+                value:
+                  type: string
+                  enum:
+                    - 1
+                    - -1
+      responses:
+        "200":
+          description: Response for status 200
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - id
+                  - userId
+                  - author
+                  - title
+                  - content
+                  - aqiIndex
+                  - location
+                  - upVotes
+                  - downVotes
+                  - createdAt
+                  - updatedAt
+                  - media
+                properties:
+                  id:
+                    type: string
+                  userId:
+                    type: string
+                  author:
+                    type: object
+                    required:
+                      - id
+                      - username
+                    properties:
+                      id:
+                        type: string
+                      username:
+                        type: string
+                      avatarUrl:
+                        type: string
+                  title:
+                    type: string
+                  content:
+                    type: string
+                  aqiIndex:
+                    type: number
+                  location:
+                    type: object
+                    required:
+                      - lat
+                      - lng
+                    properties:
+                      lat:
+                        description: Vĩ độ
+                        type: number
+                      lng:
+                        description: Kinh độ
+                        type: number
+                      name:
+                        description: Tên địa điểm
+                        type: string
+                  upVotes:
+                    type: number
+                  downVotes:
+                    type: number
+                  createdAt:
+                    type: string
+                  updatedAt:
+                    type: string
+                  media:
+                    type: array
+                    items:
+                      type: object
+                      required:
+                        - key
+                        - url
+                      properties:
+                        key:
+                          description: Object key trên S3/MinIO
+                          type: string
+                        url:
+                          description: Public URL của file
+                          type: string
+                        contentType:
+                          type: string
+                        size:
+                          type: number
+                        width:
+                          type: number
+                        height:
+                          type: number
+      operationId: postApiPostsByIdVote
+  /api/shop/products:
+    get:
+      tags:
+        - Shop
+      summary: Danh sách sản phẩm
+      parameters:
+        - name: limit
+          in: query
+          required: false
+          schema:
+            minimum: 1
+            maximum: 100
+            default: 10
+            type: number
+        - name: offset
+          in: query
+          required: false
+          schema:
+            minimum: 0
+            default: 0
+            type: number
+      responses:
+        "200":
+          description: Response for status 200
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - items
+                  - total
+                properties:
+                  items:
+                    type: array
+                    items:
+                      type: object
+                      required:
+                        - id
+                        - name
+                        - description
+                        - price
+                        - stock
+                        - imageUrl
+                        - categories
+                      properties:
+                        id:
+                          type: string
+                        name:
+                          type: string
+                        description:
+                          type: string
+                        price:
+                          type: number
+                        stock:
+                          type: number
+                        imageUrl:
+                          anyOf:
+                            - type: string
+                            - type: "null"
+                        categories:
+                          type: array
+                          items:
+                            type: object
+                            required:
+                              - id
+                              - name
+                            properties:
+                              id:
+                                type: string
+                              name:
+                                type: string
+                  total:
+                    type: number
+      operationId: getApiShopProducts
+    post:
+      tags:
+        - Shop
+      summary: Tạo sản phẩm mới (Admin only)
+      description: Tạo sản phẩm mới với ảnh và categories
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - name
+                - description
+                - price
+                - stock
+              properties:
+                name:
+                  minLength: 1
+                  maxLength: 255
+                  type: string
+                description:
+                  minLength: 1
+                  maxLength: 1000
+                  type: string
+                price:
+                  minimum: 0
+                  type: number
+                stock:
+                  minimum: 0
+                  type: number
+                imageUrl:
+                  maxLength: 1000
+                  type: string
+                categoryIds:
+                  type: array
+                  items:
+                    type: string
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              required:
+                - name
+                - description
+                - price
+                - stock
+              properties:
+                name:
+                  minLength: 1
+                  maxLength: 255
+                  type: string
+                description:
+                  minLength: 1
+                  maxLength: 1000
+                  type: string
+                price:
+                  minimum: 0
+                  type: number
+                stock:
+                  minimum: 0
+                  type: number
+                imageUrl:
+                  maxLength: 1000
+                  type: string
+                categoryIds:
+                  type: array
+                  items:
+                    type: string
+          multipart/form-data:
+            schema:
+              type: object
+              required:
+                - name
+                - description
+                - price
+                - stock
+              properties:
+                name:
+                  minLength: 1
+                  maxLength: 255
+                  type: string
+                description:
+                  minLength: 1
+                  maxLength: 1000
+                  type: string
+                price:
+                  minimum: 0
+                  type: number
+                stock:
+                  minimum: 0
+                  type: number
+                imageUrl:
+                  maxLength: 1000
+                  type: string
+                categoryIds:
+                  type: array
+                  items:
+                    type: string
+      responses:
+        "200":
+          description: Response for status 200
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - id
+                  - name
+                  - description
+                  - price
+                  - stock
+                  - imageUrl
+                  - categories
+                properties:
+                  id:
+                    type: string
+                  name:
+                    type: string
+                  description:
+                    type: string
+                  price:
+                    type: number
+                  stock:
+                    type: number
+                  imageUrl:
+                    anyOf:
+                      - type: string
+                      - type: "null"
+                  categories:
+                    type: array
+                    items:
+                      type: object
+                      required:
+                        - id
+                        - name
+                      properties:
+                        id:
+                          type: string
+                        name:
+                          type: string
+      operationId: postApiShopProducts
+  /api/shop/products/{id}:
+    get:
+      tags:
+        - Shop
+      summary: Chi tiết sản phẩm
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Response for status 200
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - id
+                  - name
+                  - description
+                  - price
+                  - stock
+                  - imageUrl
+                  - categories
+                properties:
+                  id:
+                    type: string
+                  name:
+                    type: string
+                  description:
+                    type: string
+                  price:
+                    type: number
+                  stock:
+                    type: number
+                  imageUrl:
+                    anyOf:
+                      - type: string
+                      - type: "null"
+                  categories:
+                    type: array
+                    items:
+                      type: object
+                      required:
+                        - id
+                        - name
+                      properties:
+                        id:
+                          type: string
+                        name:
+                          type: string
+      operationId: getApiShopProductsById
+    patch:
+      tags:
+        - Shop
+      summary: Cập nhật sản phẩm (Admin only)
+      description: Cập nhật thông tin sản phẩm bao gồm ảnh và categories
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  minLength: 1
+                  maxLength: 255
+                  type: string
+                description:
+                  minLength: 1
+                  maxLength: 1000
+                  type: string
+                price:
+                  minimum: 0
+                  type: number
+                stock:
+                  minimum: 0
+                  type: number
+                imageUrl:
+                  maxLength: 1000
+                  type: string
+                categoryIds:
+                  type: array
+                  items:
+                    type: string
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                name:
+                  minLength: 1
+                  maxLength: 255
+                  type: string
+                description:
+                  minLength: 1
+                  maxLength: 1000
+                  type: string
+                price:
+                  minimum: 0
+                  type: number
+                stock:
+                  minimum: 0
+                  type: number
+                imageUrl:
+                  maxLength: 1000
+                  type: string
+                categoryIds:
+                  type: array
+                  items:
+                    type: string
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                name:
+                  minLength: 1
+                  maxLength: 255
+                  type: string
+                description:
+                  minLength: 1
+                  maxLength: 1000
+                  type: string
+                price:
+                  minimum: 0
+                  type: number
+                stock:
+                  minimum: 0
+                  type: number
+                imageUrl:
+                  maxLength: 1000
+                  type: string
+                categoryIds:
+                  type: array
+                  items:
+                    type: string
+      responses:
+        "200":
+          description: Response for status 200
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - id
+                  - name
+                  - description
+                  - price
+                  - stock
+                  - imageUrl
+                  - categories
+                properties:
+                  id:
+                    type: string
+                  name:
+                    type: string
+                  description:
+                    type: string
+                  price:
+                    type: number
+                  stock:
+                    type: number
+                  imageUrl:
+                    anyOf:
+                      - type: string
+                      - type: "null"
+                  categories:
+                    type: array
+                    items:
+                      type: object
+                      required:
+                        - id
+                        - name
+                      properties:
+                        id:
+                          type: string
+                        name:
+                          type: string
+      operationId: patchApiShopProductsById
+    delete:
+      tags:
+        - Shop
+      summary: Xóa sản phẩm (Admin only)
+      description: Xóa sản phẩm và các categories liên quan
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Response for status 200
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - success
+                  - message
+                properties:
+                  success:
+                    const: true
+                    type: boolean
+                  message:
+                    type: string
+      operationId: deleteApiShopProductsById
+  /api/shop/categories:
+    get:
+      tags:
+        - Shop
+      summary: Danh sách danh mục
+      responses:
+        "200":
+          description: Response for status 200
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - items
+                properties:
+                  items:
+                    type: array
+                    items:
+                      type: object
+                      required:
+                        - id
+                        - name
+                        - description
+                      properties:
+                        id:
+                          type: string
+                        name:
+                          type: string
+                        description:
+                          type: string
+      operationId: getApiShopCategories
+  /api/shop/orders:
+    post:
+      tags:
+        - Shop
+      summary: Tạo đơn hàng (Guest hoặc User đã đăng nhập)
+      description: Guest cần cung cấp customerName, customerEmail, customerPhone,
+        shippingAddress. User đã đăng nhập không cần.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - productId
+                - quantity
+              properties:
+                productId:
+                  type: string
+                quantity:
+                  minimum: 1
+                  type: number
+                customerName:
+                  minLength: 1
+                  maxLength: 255
+                  type: string
+                customerEmail:
+                  format: email
+                  maxLength: 255
+                  type: string
+                customerPhone:
+                  minLength: 1
+                  maxLength: 20
+                  type: string
+                shippingAddress:
+                  minLength: 1
+                  maxLength: 1000
+                  type: string
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              required:
+                - productId
+                - quantity
+              properties:
+                productId:
+                  type: string
+                quantity:
+                  minimum: 1
+                  type: number
+                customerName:
+                  minLength: 1
+                  maxLength: 255
+                  type: string
+                customerEmail:
+                  format: email
+                  maxLength: 255
+                  type: string
+                customerPhone:
+                  minLength: 1
+                  maxLength: 20
+                  type: string
+                shippingAddress:
+                  minLength: 1
+                  maxLength: 1000
+                  type: string
+          multipart/form-data:
+            schema:
+              type: object
+              required:
+                - productId
+                - quantity
+              properties:
+                productId:
+                  type: string
+                quantity:
+                  minimum: 1
+                  type: number
+                customerName:
+                  minLength: 1
+                  maxLength: 255
+                  type: string
+                customerEmail:
+                  format: email
+                  maxLength: 255
+                  type: string
+                customerPhone:
+                  minLength: 1
+                  maxLength: 20
+                  type: string
+                shippingAddress:
+                  minLength: 1
+                  maxLength: 1000
+                  type: string
+      responses:
+        "200":
+          description: Response for status 200
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - id
+                  - productId
+                  - quantity
+                  - totalPrice
+                  - orderStatus
+                  - orderDate
+                properties:
+                  id:
+                    type: string
+                  userId:
+                    type: string
+                  productId:
+                    type: string
+                  quantity:
+                    type: number
+                  totalPrice:
+                    type: number
+                  orderStatus:
+                    type: string
+                  customerName:
+                    type: string
+                  customerEmail:
+                    type: string
+                  customerPhone:
+                    type: string
+                  shippingAddress:
+                    type: string
+                  orderDate:
+                    type: string
+      operationId: postApiShopOrders
+    get:
+      tags:
+        - Shop
+      summary: Đơn hàng của tôi (Authenticated users)
+      description: Lấy danh sách đơn hàng của user đã đăng nhập
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Response for status 200
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - items
+                properties:
+                  items:
+                    type: array
+                    items:
+                      type: object
+                      required:
+                        - id
+                        - productId
+                        - quantity
+                        - totalPrice
+                        - orderStatus
+                        - orderDate
+                      properties:
+                        id:
+                          type: string
+                        userId:
+                          type: string
+                        productId:
+                          type: string
+                        quantity:
+                          type: number
+                        totalPrice:
+                          type: number
+                        orderStatus:
+                          type: string
+                        customerName:
+                          type: string
+                        customerEmail:
+                          type: string
+                        customerPhone:
+                          type: string
+                        shippingAddress:
+                          type: string
+                        orderDate:
+                          type: string
+      operationId: getApiShopOrders
+  /api/shop/orders/track/{id}:
+    get:
+      tags:
+        - Shop
+      summary: Tra cứu đơn hàng bằng ID và email (cho Guest)
+      description: Guest users có thể tra cứu đơn hàng bằng ID và email đã dùng khi đặt hàng
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: email
+          in: query
+          required: true
+          schema:
+            format: email
+            type: string
+      responses:
+        "200":
+          description: Response for status 200
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - id
+                  - productId
+                  - quantity
+                  - totalPrice
+                  - orderStatus
+                  - orderDate
+                properties:
+                  id:
+                    type: string
+                  userId:
+                    type: string
+                  productId:
+                    type: string
+                  quantity:
+                    type: number
+                  totalPrice:
+                    type: number
+                  orderStatus:
+                    type: string
+                  customerName:
+                    type: string
+                  customerEmail:
+                    type: string
+                  customerPhone:
+                    type: string
+                  shippingAddress:
+                    type: string
+                  orderDate:
+                    type: string
+      operationId: getApiShopOrdersTrackById
+  /api/shop/products/upload-url:
+    post:
+      tags:
+        - Shop
+      summary: Tạo URL upload ảnh sản phẩm (Admin only)
+      description: Trả về presigned URL để upload ảnh sản phẩm lên MinIO/S3
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - contentType
+              properties:
+                contentType:
+                  description: "MIME type, e.g.: image/png"
+                  type: string
+                extension:
+                  description: "File extension, e.g.: png"
+                  type: string
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              required:
+                - contentType
+              properties:
+                contentType:
+                  description: "MIME type, e.g.: image/png"
+                  type: string
+                extension:
+                  description: "File extension, e.g.: png"
+                  type: string
+          multipart/form-data:
+            schema:
+              type: object
+              required:
+                - contentType
+              properties:
+                contentType:
+                  description: "MIME type, e.g.: image/png"
+                  type: string
+                extension:
+                  description: "File extension, e.g.: png"
+                  type: string
+      responses:
+        "200":
+          description: Response for status 200
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - uploadUrl
+                  - key
+                  - url
+                properties:
+                  uploadUrl:
+                    type: string
+                  key:
+                    type: string
+                  url:
+                    type: string
+      operationId: postApiShopProductsUpload-url
+  /api/shop/orders/{id}:
+    get:
+      tags:
+        - Shop
+      summary: Chi tiết đơn hàng (Authenticated users)
+      description: Xem chi tiết đơn hàng của chính mình
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Response for status 200
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - id
+                  - productId
+                  - quantity
+                  - totalPrice
+                  - orderStatus
+                  - orderDate
+                properties:
+                  id:
+                    type: string
+                  userId:
+                    type: string
+                  productId:
+                    type: string
+                  quantity:
+                    type: number
+                  totalPrice:
+                    type: number
+                  orderStatus:
+                    type: string
+                  customerName:
+                    type: string
+                  customerEmail:
+                    type: string
+                  customerPhone:
+                    type: string
+                  shippingAddress:
+                    type: string
+                  orderDate:
+                    type: string
+      operationId: getApiShopOrdersById
+  /api/shop/reviews:
+    post:
+      tags:
+        - Shop
+      summary: Tạo đánh giá sản phẩm
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - productId
+                - rating
+                - comment
+              properties:
+                productId:
+                  type: string
+                rating:
+                  minimum: 1
+                  maximum: 5
+                  type: number
+                comment:
+                  minLength: 1
+                  maxLength: 2000
+                  type: string
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              required:
+                - productId
+                - rating
+                - comment
+              properties:
+                productId:
+                  type: string
+                rating:
+                  minimum: 1
+                  maximum: 5
+                  type: number
+                comment:
+                  minLength: 1
+                  maxLength: 2000
+                  type: string
+          multipart/form-data:
+            schema:
+              type: object
+              required:
+                - productId
+                - rating
+                - comment
+              properties:
+                productId:
+                  type: string
+                rating:
+                  minimum: 1
+                  maximum: 5
+                  type: number
+                comment:
+                  minLength: 1
+                  maxLength: 2000
+                  type: string
+      responses:
+        "200":
+          description: Response for status 200
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - id
+                  - userId
+                  - productId
+                  - rating
+                  - comment
+                  - reviewDate
+                properties:
+                  id:
+                    type: string
+                  userId:
+                    type: string
+                  productId:
+                    type: string
+                  rating:
+                    type: number
+                  comment:
+                    type: string
+                  reviewDate:
+                    type: string
+      operationId: postApiShopReviews
+  /api/shop/products/{id}/reviews:
+    get:
+      tags:
+        - Shop
+      summary: Danh sách đánh giá sản phẩm
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Response for status 200
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - items
+                properties:
+                  items:
+                    type: array
+                    items:
+                      type: object
+                      required:
+                        - id
+                        - userId
+                        - productId
+                        - rating
+                        - comment
+                        - reviewDate
+                      properties:
+                        id:
+                          type: string
+                        userId:
+                          type: string
+                        productId:
+                          type: string
+                        rating:
+                          type: number
+                        comment:
+                          type: string
+                        reviewDate:
+                          type: string
+      operationId: getApiShopProductsByIdReviews
+  /api/esp32/login:
+    post:
+      tags:
+        - IoT Devices
+      summary: Device đăng nhập
+      description: Đăng nhập và đăng ký IoT device để gửi dữ liệu AQI
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - email
+                - password
+                - deviceId
+              properties:
+                email:
+                  format: email
+                  type: string
+                password:
+                  type: string
+                deviceId:
+                  description: ID duy nhất của device (MAC address, serial, v.v.)
+                  type: string
+                deviceName:
+                  description: Tên thiết bị
+                  type: string
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              required:
+                - email
+                - password
+                - deviceId
+              properties:
+                email:
+                  format: email
+                  type: string
+                password:
+                  type: string
+                deviceId:
+                  description: ID duy nhất của device (MAC address, serial, v.v.)
+                  type: string
+                deviceName:
+                  description: Tên thiết bị
+                  type: string
+          multipart/form-data:
+            schema:
+              type: object
+              required:
+                - email
+                - password
+                - deviceId
+              properties:
+                email:
+                  format: email
+                  type: string
+                password:
+                  type: string
+                deviceId:
+                  description: ID duy nhất của device (MAC address, serial, v.v.)
+                  type: string
+                deviceName:
+                  description: Tên thiết bị
+                  type: string
+      responses:
+        "200":
+          description: Response for status 200
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - token
+                  - registrationId
+                  - expiresIn
+                properties:
+                  token:
+                    description: JWT token cho device sử dụng trong requests
+                    type: string
+                  registrationId:
+                    description: ID của device registration
+                    type: string
+                  expiresIn:
+                    type: string
+      operationId: postApiEsp32Login
+  /api/esp32/aqi:
+    post:
+      tags:
+        - IoT Devices
+      summary: Gửi dữ liệu AQI
+      description: Device gửi chỉ số AQI hiện tại để lưu vào profile user
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - aqi
+              properties:
+                aqi:
+                  minimum: 0
+                  maximum: 500
+                  description: Chỉ số AQI (0-500)
+                  type: number
+                timestamp:
+                  description: Unix timestamp (ms), mặc định là hiện tại
+                  type: number
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              required:
+                - aqi
+              properties:
+                aqi:
+                  minimum: 0
+                  maximum: 500
+                  description: Chỉ số AQI (0-500)
+                  type: number
+                timestamp:
+                  description: Unix timestamp (ms), mặc định là hiện tại
+                  type: number
+          multipart/form-data:
+            schema:
+              type: object
+              required:
+                - aqi
+              properties:
+                aqi:
+                  minimum: 0
+                  maximum: 500
+                  description: Chỉ số AQI (0-500)
+                  type: number
+                timestamp:
+                  description: Unix timestamp (ms), mặc định là hiện tại
+                  type: number
+      responses:
+        "200":
+          description: Response for status 200
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - success
+                  - message
+                  - currentAQI
+                  - lastUpdate
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+                  currentAQI:
+                    type: number
+                  lastUpdate:
+                    type: string
+      operationId: postApiEsp32Aqi
+  /api/esp32/heartbeat:
+    post:
+      tags:
+        - IoT Devices
+      summary: Heartbeat / Keep-alive
+      description: ESP32 gửi heartbeat để cập nhật lastSeen
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Response for status 200
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - success
+                  - message
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+      operationId: postApiEsp32Heartbeat
+  /api/esp32/logout:
+    post:
+      tags:
+        - IoT Devices
+      summary: Đăng xuất device
+      description: Vô hiệu hóa device registration
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Response for status 200
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - success
+                  - message
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+      operationId: postApiEsp32Logout
+  /api/admin/stats:
+    get:
+      tags:
+        - Admin
+      summary: Thống kê hệ thống
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Response for status 200
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - totalUsers
+                  - totalProducts
+                  - totalOrders
+                  - totalDevices
+                  - totalPosts
+                  - activeDevices
+                properties:
+                  totalUsers:
+                    type: number
+                  totalProducts:
+                    type: number
+                  totalOrders:
+                    type: number
+                  totalDevices:
+                    type: number
+                  totalPosts:
+                    type: number
+                  activeDevices:
+                    type: number
+                additionalProperties: false
+      operationId: getApiAdminStats
+  /api/admin/users:
+    get:
+      tags:
+        - Admin
+      summary: Danh sách users
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: limit
+          in: query
+          required: false
+          schema:
+            minimum: 1
+            maximum: 100
+            default: 10
+            type: number
+        - name: offset
+          in: query
+          required: false
+          schema:
+            minimum: 0
+            default: 0
+            type: number
+        - name: search
+          in: query
+          required: false
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Response for status 200
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - items
+                  - total
+                properties:
+                  items:
+                    type: array
+                    items:
+                      type: object
+                      required:
+                        - id
+                        - username
+                        - email
+                        - verified
+                        - role
+                        - currentAQI
+                      properties:
+                        id:
+                          type: string
+                        username:
+                          type: string
+                        email:
+                          type: string
+                        verified:
+                          type: number
+                        role:
+                          type: string
+                        currentAQI:
+                          type: number
+                        createdAt:
+                          type: string
+                  total:
+                    type: number
+                additionalProperties: false
+      operationId: getApiAdminUsers
+  /api/admin/users/{id}:
+    get:
+      tags:
+        - Admin
+      summary: Chi tiết user
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Response for status 200
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - id
+                  - username
+                  - email
+                  - verified
+                  - role
+                  - currentAQI
+                properties:
+                  id:
+                    type: string
+                  username:
+                    type: string
+                  email:
+                    type: string
+                  verified:
+                    type: number
+                  role:
+                    type: string
+                  currentAQI:
+                    type: number
+                  createdAt:
+                    type: string
+      operationId: getApiAdminUsersById
+    patch:
+      tags:
+        - Admin
+      summary: Cập nhật user
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                role:
+                  type: string
+                verified:
+                  type: number
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                role:
+                  type: string
+                verified:
+                  type: number
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                role:
+                  type: string
+                verified:
+                  type: number
+      responses:
+        "200":
+          description: Response for status 200
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - id
+                  - username
+                  - email
+                  - verified
+                  - role
+                  - currentAQI
+                properties:
+                  id:
+                    type: string
+                  username:
+                    type: string
+                  email:
+                    type: string
+                  verified:
+                    type: number
+                  role:
+                    type: string
+                  currentAQI:
+                    type: number
+                  createdAt:
+                    type: string
+      operationId: patchApiAdminUsersById
+    delete:
+      tags:
+        - Admin
+      summary: Xóa user
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Response for status 200
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - success
+                  - message
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+      operationId: deleteApiAdminUsersById
+  /api/admin/products:
+    get:
+      tags:
+        - Admin
+      summary: Danh sách sản phẩm
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: limit
+          in: query
+          required: false
+          schema:
+            minimum: 1
+            maximum: 100
+            default: 10
+            type: number
+        - name: offset
+          in: query
+          required: false
+          schema:
+            minimum: 0
+            default: 0
+            type: number
+        - name: search
+          in: query
+          required: false
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Response for status 200
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - items
+                  - total
+                properties:
+                  items:
+                    type: array
+                    items:
+                      type: object
+                      required:
+                        - id
+                        - name
+                        - description
+                        - price
+                        - stock
+                      properties:
+                        id:
+                          type: string
+                        name:
+                          type: string
+                        description:
+                          type: string
+                        price:
+                          type: number
+                        stock:
+                          type: number
+                  total:
+                    type: number
+      operationId: getApiAdminProducts
+    post:
+      tags:
+        - Admin
+      summary: Tạo sản phẩm
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - name
+                - description
+                - price
+                - stock
+              properties:
+                name:
+                  minLength: 1
+                  maxLength: 255
+                  type: string
+                description:
+                  maxLength: 1000
+                  type: string
+                price:
+                  minimum: 0
+                  type: number
+                stock:
+                  minimum: 0
+                  type: number
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              required:
+                - name
+                - description
+                - price
+                - stock
+              properties:
+                name:
+                  minLength: 1
+                  maxLength: 255
+                  type: string
+                description:
+                  maxLength: 1000
+                  type: string
+                price:
+                  minimum: 0
+                  type: number
+                stock:
+                  minimum: 0
+                  type: number
+          multipart/form-data:
+            schema:
+              type: object
+              required:
+                - name
+                - description
+                - price
+                - stock
+              properties:
+                name:
+                  minLength: 1
+                  maxLength: 255
+                  type: string
+                description:
+                  maxLength: 1000
+                  type: string
+                price:
+                  minimum: 0
+                  type: number
+                stock:
+                  minimum: 0
+                  type: number
+      responses:
+        "200":
+          description: Response for status 200
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - id
+                  - name
+                  - description
+                  - price
+                  - stock
+                properties:
+                  id:
+                    type: string
+                  name:
+                    type: string
+                  description:
+                    type: string
+                  price:
+                    type: number
+                  stock:
+                    type: number
+      operationId: postApiAdminProducts
+  /api/admin/products/{id}:
+    patch:
+      tags:
+        - Admin
+      summary: Cập nhật sản phẩm
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  maxLength: 255
+                  type: string
+                description:
+                  maxLength: 1000
+                  type: string
+                price:
+                  minimum: 0
+                  type: number
+                stock:
+                  minimum: 0
+                  type: number
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                name:
+                  maxLength: 255
+                  type: string
+                description:
+                  maxLength: 1000
+                  type: string
+                price:
+                  minimum: 0
+                  type: number
+                stock:
+                  minimum: 0
+                  type: number
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                name:
+                  maxLength: 255
+                  type: string
+                description:
+                  maxLength: 1000
+                  type: string
+                price:
+                  minimum: 0
+                  type: number
+                stock:
+                  minimum: 0
+                  type: number
+      responses:
+        "200":
+          description: Response for status 200
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - id
+                  - name
+                  - description
+                  - price
+                  - stock
+                properties:
+                  id:
+                    type: string
+                  name:
+                    type: string
+                  description:
+                    type: string
+                  price:
+                    type: number
+                  stock:
+                    type: number
+      operationId: patchApiAdminProductsById
+    delete:
+      tags:
+        - Admin
+      summary: Xóa sản phẩm
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Response for status 200
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - success
+                  - message
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+      operationId: deleteApiAdminProductsById
+  /api/admin/orders:
+    get:
+      tags:
+        - Admin
+      summary: Danh sách đơn hàng
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: limit
+          in: query
+          required: false
+          schema:
+            minimum: 1
+            maximum: 100
+            default: 10
+            type: number
+        - name: offset
+          in: query
+          required: false
+          schema:
+            minimum: 0
+            default: 0
+            type: number
+        - name: search
+          in: query
+          required: false
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Response for status 200
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - items
+                  - total
+                properties:
+                  items:
+                    type: array
+                    items:
+                      type: object
+                      required:
+                        - id
+                        - userId
+                        - productId
+                        - quantity
+                        - orderDate
+                      properties:
+                        id:
+                          type: string
+                        userId:
+                          type: string
+                        productId:
+                          type: string
+                        quantity:
+                          type: number
+                        orderDate:
+                          type: string
+                  total:
+                    type: number
+      operationId: getApiAdminOrders
+  /api/admin/orders/{id}:
+    delete:
+      tags:
+        - Admin
+      summary: Xóa đơn hàng
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Response for status 200
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - success
+                  - message
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+      operationId: deleteApiAdminOrdersById
+  /api/admin/devices:
+    get:
+      tags:
+        - Admin
+      summary: Danh sách IoT devices
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: limit
+          in: query
+          required: false
+          schema:
+            minimum: 1
+            maximum: 100
+            default: 10
+            type: number
+        - name: offset
+          in: query
+          required: false
+          schema:
+            minimum: 0
+            default: 0
+            type: number
+        - name: search
+          in: query
+          required: false
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Response for status 200
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - items
+                  - total
+                properties:
+                  items:
+                    type: array
+                    items:
+                      type: object
+                      required:
+                        - id
+                        - userId
+                        - deviceId
+                        - deviceName
+                        - deviceType
+                        - isActive
+                        - createdAt
+                      properties:
+                        id:
+                          type: string
+                        userId:
+                          type: string
+                        deviceId:
+                          type: string
+                        deviceName:
+                          type: string
+                        deviceType:
+                          type: string
+                        isActive:
+                          type: number
+                        lastSeen:
+                          type: string
+                        createdAt:
+                          type: string
+                  total:
+                    type: number
+                additionalProperties: false
+      operationId: getApiAdminDevices
+  /api/admin/devices/{id}:
+    patch:
+      tags:
+        - Admin
+      summary: Vô hiệu hóa device
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Response for status 200
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - id
+                  - userId
+                  - deviceId
+                  - deviceName
+                  - deviceType
+                  - isActive
+                  - createdAt
+                properties:
+                  id:
+                    type: string
+                  userId:
+                    type: string
+                  deviceId:
+                    type: string
+                  deviceName:
+                    type: string
+                  deviceType:
+                    type: string
+                  isActive:
+                    type: number
+                  lastSeen:
+                    type: string
+                  createdAt:
+                    type: string
+      operationId: patchApiAdminDevicesById
+    delete:
+      tags:
+        - Admin
+      summary: Xóa device
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Response for status 200
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - success
+                  - message
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+      operationId: deleteApiAdminDevicesById
+  /api/admin/posts:
+    get:
+      tags:
+        - Admin
+      summary: Danh sách bài viết
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: limit
+          in: query
+          required: false
+          schema:
+            minimum: 1
+            maximum: 100
+            default: 10
+            type: number
+        - name: offset
+          in: query
+          required: false
+          schema:
+            minimum: 0
+            default: 0
+            type: number
+        - name: search
+          in: query
+          required: false
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Response for status 200
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - items
+                  - total
+                properties:
+                  items:
+                    type: array
+                    items:
+                      type: object
+                      required:
+                        - id
+                        - userId
+                        - title
+                        - aqiIndex
+                        - upVotes
+                        - downVotes
+                        - createdAt
+                      properties:
+                        id:
+                          type: string
+                        userId:
+                          type: string
+                        title:
+                          type: string
+                        aqiIndex:
+                          type: number
+                        upVotes:
+                          type: number
+                        downVotes:
+                          type: number
+                        createdAt:
+                          type: string
+                  total:
+                    type: number
+      operationId: getApiAdminPosts
+  /api/admin/posts/{id}:
+    delete:
+      tags:
+        - Admin
+      summary: Xóa bài viết
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Response for status 200
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - success
+                  - message
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+      operationId: deleteApiAdminPostsById
+  /api/devices/check/{deviceId}:
+    get:
+      tags:
+        - Devices
+      summary: Kiểm tra device đã có user hay chưa
+      description: Kiểm tra xem một device đã kết nối với user nào hay chưa. Endpoint
+        này không yêu cầu authorization vì dùng cho phần cứng.
+      parameters:
+        - name: deviceId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Response for status 200
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - hasUser
+                  - deviceId
+                properties:
+                  hasUser:
+                    type: boolean
+                  userId:
+                    type: string
+                  deviceId:
+                    type: string
+                  deviceName:
+                    type: string
+                  isActive:
+                    type: number
+      operationId: getApiDevicesCheckByDeviceId
+  /api/devices/:
+    get:
+      tags:
+        - Devices
+      summary: Lấy danh sách thiết bị của user
+      description: Trả về tất cả thiết bị IoT thuộc về user hiện tại
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Response for status 200
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - devices
+                  - total
+                properties:
+                  devices:
+                    type: array
+                    items:
+                      type: object
+                      required:
+                        - id
+                        - deviceId
+                        - isActive
+                        - createdAt
+                      properties:
+                        id:
+                          type: string
+                        deviceId:
+                          type: string
+                        deviceName:
+                          type: string
+                        deviceType:
+                          type: string
+                        isActive:
+                          type: number
+                        lastSeen:
+                          type: string
+                        createdAt:
+                          type: string
+                  total:
+                    type: number
+      operationId: getApiDevices
+  /api/devices/{deviceId}:
+    get:
+      tags:
+        - Devices
+      summary: Lấy thông tin chi tiết thiết bị
+      description: Trả về thông tin chi tiết của một thiết bị theo deviceId
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: deviceId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Response for status 200
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - id
+                  - deviceId
+                  - isActive
+                  - createdAt
+                properties:
+                  id:
+                    type: string
+                  deviceId:
+                    type: string
+                  deviceName:
+                    type: string
+                  deviceType:
+                    type: string
+                  isActive:
+                    type: number
+                  lastSeen:
+                    type: string
+                  createdAt:
+                    type: string
+      operationId: getApiDevicesByDeviceId
+  /api/user/avatar:
+    post:
+      tags:
+        - User
+      summary: Upload user avatar
+      description: "Upload user avatar directly to MinIO/S3. Max 5MB. Supported: PNG,
+        JPG, GIF, WebP"
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - file
+              properties:
+                file:
+                  default: File
+                  description: Avatar image file (PNG, JPG, GIF, WebP)
+                  type: string
+                  format: binary
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              required:
+                - file
+              properties:
+                file:
+                  default: File
+                  description: Avatar image file (PNG, JPG, GIF, WebP)
+                  type: string
+                  format: binary
+          multipart/form-data:
+            schema:
+              type: object
+              required:
+                - file
+              properties:
+                file:
+                  default: File
+                  description: Avatar image file (PNG, JPG, GIF, WebP)
+                  type: string
+                  format: binary
+      responses:
+        "200":
+          description: Response for status 200
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - success
+                  - user
+                properties:
+                  success:
+                    const: true
+                    type: boolean
+                  user:
+                    type: object
+                    required:
+                      - id
+                      - username
+                      - email
+                      - verified
+                      - avatarUrl
+                      - role
+                    properties:
+                      id:
+                        type: string
+                      username:
+                        type: string
+                      email:
+                        type: string
+                      verified:
+                        type: number
+                      avatarUrl:
+                        anyOf:
+                          - type: string
+                          - type: "null"
+                      role:
+                        type: string
+                      aqi:
+                        type: number
+                      ppm:
+                        type: number
+                      firstName:
+                        type: string
+                      lastName:
+                        type: string
+                      phoneNumber:
+                        type: string
+                      age:
+                        type: number
+                additionalProperties: false
+        "400":
+          description: Response for status 400
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - success
+                  - error
+                properties:
+                  success:
+                    const: false
+                    type: boolean
+                  error:
+                    type: string
+                additionalProperties: false
+        "401":
+          description: Response for status 401
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - success
+                  - error
+                properties:
+                  success:
+                    const: false
+                    type: boolean
+                  error:
+                    type: string
+                additionalProperties: false
+        "500":
+          description: Response for status 500
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - success
+                  - error
+                properties:
+                  success:
+                    const: false
+                    type: boolean
+                  error:
+                    type: string
+                additionalProperties: false
+      operationId: postApiUserAvatar
+  /api/user/me:
+    get:
+      tags:
+        - User
+      summary: Lấy thông tin user hiện tại
+      description: Lấy thông tin của user hiện tại kèm AQI, PPM và user info. Yêu cầu
+        xác thực bằng token JWT.
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Response for status 200
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - success
+                  - user
+                properties:
+                  success:
+                    const: true
+                    type: boolean
+                  user:
+                    type: object
+                    required:
+                      - id
+                      - username
+                      - email
+                      - verified
+                      - avatarUrl
+                      - role
+                    properties:
+                      id:
+                        type: string
+                      username:
+                        type: string
+                      email:
+                        type: string
+                      verified:
+                        type: number
+                      avatarUrl:
+                        anyOf:
+                          - type: string
+                          - type: "null"
+                      role:
+                        type: string
+                      aqi:
+                        type: number
+                      ppm:
+                        type: number
+                      firstName:
+                        type: string
+                      lastName:
+                        type: string
+                      phoneNumber:
+                        type: string
+                      age:
+                        type: number
+                additionalProperties: false
+        "400":
+          description: Response for status 400
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - success
+                  - error
+                properties:
+                  success:
+                    const: false
+                    type: boolean
+                  error:
+                    type: string
+                additionalProperties: false
+      operationId: getApiUserMe
+    patch:
+      tags:
+        - User
+      summary: Cập nhật thông tin user hiện tại
+      description: Cập nhật thông tin user (username, email, avatar, firstName,
+        lastName, phoneNumber, age). Yêu cầu xác thực bằng token JWT.
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                username:
+                  type: string
+                email:
+                  type: string
+                avatarUrl:
+                  type: string
+                firstName:
+                  type: string
+                lastName:
+                  type: string
+                phoneNumber:
+                  type: string
+                age:
+                  type: number
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                username:
+                  type: string
+                email:
+                  type: string
+                avatarUrl:
+                  type: string
+                firstName:
+                  type: string
+                lastName:
+                  type: string
+                phoneNumber:
+                  type: string
+                age:
+                  type: number
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                username:
+                  type: string
+                email:
+                  type: string
+                avatarUrl:
+                  type: string
+                firstName:
+                  type: string
+                lastName:
+                  type: string
+                phoneNumber:
+                  type: string
+                age:
+                  type: number
+      responses:
+        "200":
+          description: Response for status 200
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - success
+                  - user
+                properties:
+                  success:
+                    const: true
+                    type: boolean
+                  user:
+                    type: object
+                    required:
+                      - id
+                      - username
+                      - email
+                      - verified
+                      - avatarUrl
+                      - role
+                    properties:
+                      id:
+                        type: string
+                      username:
+                        type: string
+                      email:
+                        type: string
+                      verified:
+                        type: number
+                      avatarUrl:
+                        anyOf:
+                          - type: string
+                          - type: "null"
+                      role:
+                        type: string
+                      aqi:
+                        type: number
+                      ppm:
+                        type: number
+                      firstName:
+                        type: string
+                      lastName:
+                        type: string
+                      phoneNumber:
+                        type: string
+                      age:
+                        type: number
+                additionalProperties: false
+        "400":
+          description: Response for status 400
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - success
+                  - error
+                properties:
+                  success:
+                    const: false
+                    type: boolean
+                  error:
+                    type: string
+                additionalProperties: false
+      operationId: patchApiUserMe
+components:
+  schemas: {}

@@ -2,7 +2,7 @@ import Image from "next/image";
 
 export function Feature() {
   return (
-    <div className="relative w-full min-h-screen bg-zinc-50 font-sans dark:bg-black/90 border-t border-t-gray-800 backdrop-blur-2xl flex flex-col items-center justify-center overflow-hidden gap-4">
+    <div className="relative w-full min-h-screen bg-black font-sans dark:bg-black/90 border-t border-t-gray-800 backdrop-blur-2xl flex flex-col items-center justify-center overflow-hidden gap-4">
       <div className="relative w-full h-30 z-10 flex flex-col justify-center items-center mb-20 overflow-hidden">
         <div className="absolute inset-0 bg-[repeating-linear-gradient(45deg,#000_0px,#000_40px,#facc15_40px,#facc15_90px)]"></div>
         <div className="relative z-10">

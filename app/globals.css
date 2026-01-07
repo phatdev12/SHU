@@ -1,7 +1,8 @@
 @import "tailwindcss";
+@import "@heroui/styles"; 
 
 :root {
-  --background: #ffffff;
+  --background: #000000;
   --foreground: #171717;
   --dark-blue: #0010C5;
   --light-blue: #4655F6;
@@ -14,13 +15,6 @@
   --font-mono: var(--font-geist-mono);
   --color-dark-blue: #0010C5;
   --color-light-blue: #4655F6;
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #000000;
-    --foreground: #ededed;
-  }
 }
 
 body {
